@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: pattern_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"       # broker
+      - "15672:15672"     # management UI
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      CONFIG_REPO_PATH: file:/app/config-repo
+    volumes:
+      - ./config-repo:/app/config-repo
+    depends_on:
+      - rabbitmq
+      - postgres
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+
+  pattern-service:
+    build: ./pattern-service
+    container_name: pattern-service
+    ports:
+      - "8081:8080"
+    depends_on:
+      - config-server
+      - eureka-server
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+
+volumes:
+  pgdata:
