@@ -1,19 +1,18 @@
-version: '3.8'
-
 services:
 
-  postgres:
-    image: postgres:15
-    container_name: postgres
+  pattern-db:
+    image: mongo:latest
+    container_name: pattern-db
     restart: always
-    environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev
-      POSTGRES_DB: pattern_db
     ports:
-      - "5432:5432"
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: patterndb
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pattern-mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -34,7 +33,7 @@ services:
       - ./config-repo:/app/config-repo
     depends_on:
       - rabbitmq
-      - postgres
+      - pattern-db
 
   eureka-server:
     build: ./eureka-server
@@ -48,13 +47,13 @@ services:
     build: ./pattern-service
     container_name: pattern-service
     ports:
-      - "8081:8080"
+      - "8081:8081"
     depends_on:
       - config-server
       - eureka-server
-      - postgres
+      - pattern-db
     environment:
       SPRING_PROFILES_ACTIVE: default
 
 volumes:
-  pgdata:
+  pattern-mongo-data:
