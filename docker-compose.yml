@@ -27,6 +27,19 @@ services:
     volumes:
       - keystroke-pgdata:/var/lib/postgresql/data
 
+  session-db:
+    image: postgres:latest
+    container_name: session-db
+    restart: always
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: session_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - session-pgdata:/var/lib/postgresql/data
+
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -81,6 +94,19 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
 
+  session-service:
+    build: ./session-service
+    container_name: session-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - config-server
+      - eureka-server
+      - session-db
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+
 volumes:
   pattern-mongo-data:
   keystroke-pgdata:
+  session-pgdata:
