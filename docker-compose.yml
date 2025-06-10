@@ -1,18 +1,18 @@
 services:
 
-  pattern-db:
+  pattern-detector-sequence-db:
     image: mongo:latest
-    container_name: pattern-db
+    container_name: pattern-detector-sequence-db
     restart: always
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: patterndb
+      MONGO_INITDB_DATABASE: pattern-detector-sequence
     volumes:
-      - pattern-mongo-data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - pattern-detector-sequence-data:/data/db
+      - ./pattern-detector-sequence/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   keystroke-db:
     image: postgres:latest
@@ -40,6 +40,12 @@ services:
     volumes:
       - session-pgdata:/var/lib/postgresql/data
 
+  pattern-detector-sequence-redis:
+    image: redis:latest
+    container_name: pattern-detector-sequence-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -60,7 +66,6 @@ services:
       - ./config-repo:/app/config-repo
     depends_on:
       - rabbitmq
-      - pattern-db
 
   eureka-server:
     build: ./eureka-server
@@ -69,18 +74,6 @@ services:
       - "8761:8761"
     depends_on:
       - config-server
-
-  pattern-service:
-    build: ./pattern-service
-    container_name: pattern-service
-    ports:
-      - "8081:8081"
-    depends_on:
-      - config-server
-      - eureka-server
-      - pattern-db
-    environment:
-      SPRING_PROFILES_ACTIVE: default
 
   keystroke-service:
     build: ./keystroke-service
@@ -106,7 +99,20 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
 
+  pattern-detector-sequence:
+    build: ./pattern-detector-sequence
+    container_name: pattern-detector-sequence
+    ports:
+      - "8084:8084"
+    depends_on:
+      - config-server
+      - eureka-server
+      - pattern-detector-sequence-redis
+      - rabbitmq
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+
 volumes:
-  pattern-mongo-data:
+  pattern-detector-sequence-data:
   keystroke-pgdata:
   session-pgdata:
