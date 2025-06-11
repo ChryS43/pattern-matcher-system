@@ -38,6 +38,13 @@ public class KeystrokeServiceImpl implements KeystrokeService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public KeystrokeResponse getById(UUID id) {
+        return repository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new RuntimeException("Keystroke not found with id: " + id));
+    }
+
     private KeystrokeResponse toResponse(Keystroke k) {
         return KeystrokeResponse.builder()
                 .id(k.getId())

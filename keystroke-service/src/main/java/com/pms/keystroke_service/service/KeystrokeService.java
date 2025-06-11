@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface KeystrokeService {
     KeystrokeResponse save(KeystrokeRequest request);
     List<KeystrokeResponse> getBySession(UUID sessionId);
+    KeystrokeResponse getById(UUID id);
 }
