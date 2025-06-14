@@ -1,7 +1,7 @@
 package com.pms.pattern_detector_sequence.service;
 
-import com.pms.pattern_detector_sequence.dto.KeystrokeMessage;
+import org.springframework.amqp.core.Message;
 
 public interface KeystrokeMessageListener {
-    void receiveMessage(KeystrokeMessage message);
+    void receiveMessage(Message message);
 } 
