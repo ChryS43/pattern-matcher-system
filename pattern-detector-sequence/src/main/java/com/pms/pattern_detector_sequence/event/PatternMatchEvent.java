@@ -1,5 +1,7 @@
 package com.pms.pattern_detector_sequence.event;
 
+import com.pms.pattern_detector_sequence.dto.KeystrokeMessage;
+import com.pms.pattern_detector_sequence.entity.PatternEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatternMatchEvent {
-    private String patternId;
-    private String patternName;
+    private PatternEntity pattern;
+    private List<KeystrokeMessage> matchedKeystrokes;
     private String sessionId;
-    private Instant matchTime;
-    private List<String> matchedEventIds;
+    private Instant timestamp;
 } 

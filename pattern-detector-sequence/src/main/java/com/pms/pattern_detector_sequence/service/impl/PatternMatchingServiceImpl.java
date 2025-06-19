@@ -10,6 +10,7 @@ import com.pms.pattern_detector_sequence.service.PatternMatchingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,12 @@ public class PatternMatchingServiceImpl implements PatternMatchingService {
     private final PatternRepository patternRepository;
     private final RabbitTemplate rabbitTemplate;
     private final ApplicationEventPublisher eventPublisher;
-    private static final String PATTERN_MATCH_EXCHANGE = "pattern.match.exchange";
-    private static final String PATTERN_MATCH_ROUTING_KEY = "pattern.match";
+
+    @Value("${match-event.exchange.name}")
+    private String patternMatchExchange;
+
+    @Value("${match-event.routing.key}")
+    private String patternMatchRoutingKey;
 
     @Override
     public void processKeystroke(String sessionId, KeystrokeMessage event) {
@@ -346,21 +351,18 @@ public class PatternMatchingServiceImpl implements PatternMatchingService {
         log.debug("Pattern matched: id={}, name={}, sessionId={}, matchedEvents={}", 
                 pattern.getId(), pattern.getName(), pattern.getSessionId(), matchedEvents.size());
 
-        // Commented out event publishing for now
-        /*
         PatternMatchEvent matchEvent = new PatternMatchEvent(
-                pattern.getId(),
-                pattern.getName(),
+                pattern,
+                matchedEvents,
                 pattern.getSessionId(),
-                Instant.now(),
-                matchedEvents.stream().map(KeystrokeMessage::getId).map(Object::toString).toList()
+                Instant.now()
         );
 
         try {
             // Publish to RabbitMQ
             log.debug("Publishing pattern match to RabbitMQ: exchange={}, routingKey={}", 
-                    PATTERN_MATCH_EXCHANGE, PATTERN_MATCH_ROUTING_KEY);
-            rabbitTemplate.convertAndSend(PATTERN_MATCH_EXCHANGE, PATTERN_MATCH_ROUTING_KEY, matchEvent);
+                    patternMatchExchange, patternMatchRoutingKey);
+            rabbitTemplate.convertAndSend(patternMatchExchange, patternMatchRoutingKey, matchEvent);
             
             // Publish as Spring event
             log.debug("Publishing pattern match as Spring event");
@@ -371,8 +373,7 @@ public class PatternMatchingServiceImpl implements PatternMatchingService {
             System.out.println("Pattern matched: " + pattern.getName() + 
                     " (Session: " + pattern.getSessionId() + ")");
         }
-        */
-
+        
         // Simple logging of matched key and duration
         if (!matchedEvents.isEmpty()) {
             KeystrokeMessage lastEvent = matchedEvents.get(matchedEvents.size() - 1);

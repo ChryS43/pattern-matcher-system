@@ -111,7 +111,35 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
 
+  match-event-db:
+    image: mongo:latest
+    container_name: match-event-db
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: match-event
+    volumes:
+      - match-event-data:/data/db
+      - ./match-event/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  match-event-service:
+    build: ./match-event
+    container_name: match-event-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - config-server
+      - eureka-server
+      - match-event-db
+      - rabbitmq
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+
 volumes:
   pattern-detector-sequence-data:
   keystroke-pgdata:
   session-pgdata:
+  match-event-data:
