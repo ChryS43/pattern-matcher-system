@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-server-config
+  namespace: pattern-matcher-system
+data:
+  SPRING_APPLICATION_NAME: "config-server"
+  SERVER_PORT: "8888"
+  DEBUG: "true"
+  SPRING_PROFILES_ACTIVE: "git"
+  SPRING_CLOUD_CONFIG_SERVER_GIT_URI: "https://github.com/ChryS43/pattern-matcher-system"
+  SPRING_CLOUD_CONFIG_SERVER_GIT_SEARCH_PATHS: "config-repo"
+  SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL: "dev"

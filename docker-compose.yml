@@ -58,9 +58,8 @@ services:
     container_name: config-server
     ports:
       - "8888:8888"
-    environment:
-      SPRING_PROFILES_ACTIVE: native
-      CONFIG_REPO_PATH: file:/app/config-repo
+    env_file:
+      - ./config-server/env.native
     volumes:
       - ./config-repo:/app/config-repo
     depends_on:
