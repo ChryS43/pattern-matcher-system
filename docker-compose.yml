@@ -72,6 +72,11 @@ services:
       - "8761:8761"
     depends_on:
       - config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      CONFIGSERVER_URI: http://config-server:8888
+      WAIT_FOR_IT: "true"
+      WAIT_FOR_IT_HOST: "config-server:8888"
 
   keystroke-service:
     build: ./keystroke-service
@@ -96,6 +101,14 @@ services:
       - session-db
     environment:
       SPRING_PROFILES_ACTIVE: default
+      CONFIGSERVER_URI: http://config-server:8888
+      EUREKA_URI: http://eureka-server:8761/eureka
+      DB_URL: jdbc:postgresql://session-db:5432/session_db
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
+      environment:
+      WAIT_FOR_IT: "true"
+      WAIT_FOR_IT_HOSTS: "config-server:8888,eureka-server:8761"
 
   pattern-detector-sequence:
     build: ./pattern-detector-sequence

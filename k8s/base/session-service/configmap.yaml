@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: session-service-config
+  namespace: pattern-matcher-system
+data:
+  SPRING_PROFILES_ACTIVE: "default"
+  CONFIGSERVER_URI: "http://config-server.pattern-matcher-system.svc.cluster.local:8888"
+  EUREKA_URI: "http://eureka-server.pattern-matcher-system.svc.cluster.local:8761/eureka"
+  DB_URL: "jdbc:postgresql://session-db.pattern-matcher-system.svc.cluster.local:5432/session_db"
+  DB_USERNAME: "dev"
+  DB_PASSWORD: "dev"
+  WAIT_FOR_IT: "false"
