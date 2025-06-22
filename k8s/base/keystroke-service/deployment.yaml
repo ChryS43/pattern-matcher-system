@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keystroke-service
+  namespace: pattern-matcher-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keystroke-service
+  template:
+    metadata:
+      labels:
+        app: keystroke-service
+    spec:
+      containers:
+        - name: keystroke-service
+          image: christiandenisi/keystroke-service:dev
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: keystroke-service-config
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 10
+            periodSeconds: 5 

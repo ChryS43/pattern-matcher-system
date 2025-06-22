@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keystroke-service-config
+  namespace: pattern-matcher-system
+data:
+  SPRING_PROFILES_ACTIVE: "default"
+  CONFIGSERVER_URI: "http://config-server.pattern-matcher-system.svc.cluster.local:8888"
+  EUREKA_URI: "http://eureka-server.pattern-matcher-system.svc.cluster.local:8761/eureka"
+  DB_URL: "jdbc:postgresql://keystroke-db.pattern-matcher-system.svc.cluster.local:5432/keystroke_db"
+  DB_USERNAME: "dev"
+  DB_PASSWORD: "dev"
+  RABBITMQ_HOST: "rabbitmq.pattern-matcher-system.svc.cluster.local"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USERNAME: "guest"
+  RABBITMQ_PASSWORD: "guest"
+  WAIT_FOR_IT: "false" 
+  DEBUG: "true"
